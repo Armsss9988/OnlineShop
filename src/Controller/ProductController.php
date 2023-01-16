@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,15 +36,16 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $productRepository->add($product, true);
-
-            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+            $product->setImage("None");
+            $productRepository->add($product);
+            return $this->uploadImage($form, $productRepository, $product);
         }
 
         return $this->renderForm('product/new.html.twig', [
             'product' => $product,
             'form' => $form,
         ]);
+
     }
 
     /**
@@ -66,8 +68,7 @@ class ProductController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $productRepository->add($product, true);
-
-            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+            return $this->uploadImage($form, $productRepository, $product);
         }
 
         return $this->renderForm('product/edit.html.twig', [
@@ -85,6 +86,31 @@ class ProductController extends AbstractController
             $productRepository->remove($product, true);
         }
 
+        return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @param \Symfony\Component\Form\FormInterface $form
+     * @param ProductRepository $productRepository
+     * @param Product $product
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function uploadImage(\Symfony\Component\Form\FormInterface $form, ProductRepository $productRepository, Product $product): \Symfony\Component\HttpFoundation\RedirectResponse
+    {
+        $productImg = $form->get('Image')->getData();
+        if ($productImg) {
+            $productRepository->add($product, true);
+            $newFilename = $product->getId() . '.' . $productImg->guessExtension();
+            try {
+                $productImg->move(
+                    $this->getParameter('product_directory'),
+                    $newFilename
+                );
+            } catch (FileException $e) {
+            }
+            $product->setImage($newFilename);
+        }
+        $productRepository->add($product, true);
         return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
     }
 }
