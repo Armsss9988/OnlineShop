@@ -24,7 +24,6 @@ class ProductRepository extends ServiceEntityRepository
     public function add(Product $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
-
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -38,6 +37,13 @@ class ProductRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function filter(): \Doctrine\ORM\Query
+    {
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select('p')
+            ->from('App:Product', 'p')
+        ->getQuery();
+   }
 
 //    /**
 //     * @return Product[] Returns an array of Product objects

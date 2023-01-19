@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,12 +18,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductController extends AbstractController
 {
     /**
-     * @Route("/", name="app_product_index", methods={"GET"})
+     * @Route("/{page<\d+>}", name="app_product_index", methods={"GET"})
      */
-    public function index(ProductRepository $productRepository): Response
+    public function index(Request $request,ProductRepository $productRepository,int $page = 1): Response
     {
+        $pageSize = 10;
+        $paginator = new Paginator($productRepository->filter());
+        $totalItems = count($paginator);
+        $numOfPages = ceil($totalItems / $pageSize);
+        $products = $paginator
+            ->getQuery()
+            ->setFirstResult($pageSize * ($page - 1)) // set the offset
+            ->setMaxResults($pageSize) // set the limit
+            ->getResult();
+
         return $this->render('product/index.html.twig', [
-            'products' => $productRepository->findAll(),
+            'products' => $products,
+            'numOfPages' => $numOfPages
+
         ]);
     }
 

@@ -3,39 +3,59 @@
 {% block title %}Product index{% endblock %}
 
 {% block body %}
-    <h1>Product index</h1>
+    <div class="container-md">
+        <div class="row">
+            <div class="col-3">
+                <form action={{ path('app_product_index') }} method="get">
+                    <!-- Same OLD code for sidebar-->
+                </form>
+            </div>
+            <div class="col-9">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6"><h4>Product Listing</h4></div>
+                        <div class="col-3 text-end"><p>Price: </p></div>
+                        <!-- Same OLD code for sorting price -->
+                    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Image</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for product in products %}
-            <tr>
-                <td>{{ product.id }}</td>
-                <td>{{ product.Name }}</td>
-                <td>{{ product.Category }}</td>
-                <td>{{ product.Price }}</td>
-                <td>{{ product.Image }}</td>
-                <td>
-                    <a href="{{ path('app_product_show', {'id': product.id}) }}">show</a>
-                    <a href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    <div class="row row-cols-1 row-cols-md-4 g-4">
+                        {% for product in products %}
+                            <div class="col">
+                                <div class="card h-100">
+                                    <!-- Same OLD code for product card -->
+                                    <img class="card-img-top" src="{{ asset('images/logo.jpg') }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ product.Name }}</h5>
+                                        <h6 class="card-subtitle">Category: {{ product.category }}</h6>
+                                        <p>Price: {{ product.price }}</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="{{ path('app_product_show', {'id': product.id}) }}"
+                                           class="btn btn-primary">Show</a>
+                                    </div>
 
-    <a href="{{ path('app_product_new') }}">Create new</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row mt-2">
+                        <div style="display:flex;text-align:center;justify-content:center">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    {% for i in range(1, numOfPages) %}
+                                        {% set style = app.request.get('page')==i ? "active" : "" %}
+                                        <li class="page-item {{ style }}">
+                                            <a class="page-link"
+                                               href={{ path(app.request.attributes.get('_route'),
+                                                app.request.query.all|merge({'page': i})) }}>{{ i }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
