@@ -5,25 +5,38 @@
 {% block body %}
     <div class="container-md">
         <div class="row">
-            <div class="col-3">
-                <form action={{ path('app_product_index') }} method="get">
-                    <!-- Same OLD code for sidebar-->
-                </form>
+            <div class="col-3 border">
+                <h3>Shopping Cart</h3>
+                <div class="row">
+                    <div class="col-9">Name</div>
+                    <div class="col-3">Quantity</div>
+                </div>
+                {% for id,quantity in cart %}
+                    {% for product in products %}
+                        {% if id == product.Id %}
+                    <div class="row">
+                    <div class="col-9">{{ product.Name }}</div>
+                    <div class="col-3">{{ quantity }}</div>
+                    </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <div>
+                    <a href="{{ path('app_checkout_cart') }}"
+                       class="btn btn-primary">Checkout</a>
+                </div>
             </div>
-            <div class="col-9">
+            <div class="col-9 border">
                 <div class="container">
                     <div class="row">
                         <div class="col-6"><h4>Product Listing</h4></div>
-                        <div class="col-3 text-end"><p>Price: </p></div>
-                        <!-- Same OLD code for sorting price -->
                     </div>
 
                     <div class="row row-cols-1 row-cols-md-4 g-4">
                         {% for product in products %}
                             <div class="col">
                                 <div class="card h-100">
-                                    <!-- Same OLD code for product card -->
-                                    <img class="card-img-top" src="{{ asset('public/image/product' ~ product.Id) }}">
+                                    <img class="card-img-top" src="{{ asset('/images/product/' ~ product.Image) }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ product.Name }}</h5>
                                         <h6 class="card-subtitle">Category: {{ product.category }}</h6>

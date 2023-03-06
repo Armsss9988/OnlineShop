@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 /**
  * @Route("/product")
  */
@@ -22,6 +21,11 @@ class ProductController extends AbstractController
      */
     public function index(Request $request,ProductRepository $productRepository,int $page = 1): Response
     {
+        $session = $request->getSession();
+        if ($session->has('cartElements')) {
+            $cartElements = $session->get('cartElements');
+        } else
+            $cartElements = [];
         $pageSize = 10;
         $paginator = new Paginator($productRepository->filter());
         $totalItems = count($paginator);
@@ -34,8 +38,8 @@ class ProductController extends AbstractController
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
-            'numOfPages' => $numOfPages
-
+            'numOfPages' => $numOfPages,
+            'cart' => $cartElements
         ]);
     }
 
@@ -62,7 +66,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="app_product_show", methods={"GET"})
+     * @Route("/show/{id}", name="app_product_show", methods={"GET"})
      */
     public function show(Product $product): Response
     {

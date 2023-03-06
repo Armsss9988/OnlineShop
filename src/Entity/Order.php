@@ -35,6 +35,12 @@ class Order
      */
     private $orderDetails;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=0, nullable=true)
+     */
+    private $Total;
+
+
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
@@ -98,4 +104,18 @@ class Order
 
         return $this;
     }
+
+    public function getTotal(): ?string
+    {
+        return $this->Total;
+    }
+
+    public function setTotal(?string $Total): self
+    {
+        $this->Total = $Total;
+
+        return $this;
+    }
+
+
 }
